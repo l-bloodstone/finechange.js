@@ -1,0 +1,23 @@
+{
+  "name": "xchange",
+  "version": "0.0.1-1",
+  "description": "Package for managing currency operations.",
+  "keywords": [
+    "currency"
+  ],
+  "homepage": "https://github.com/l-bloodstone/xchange#readme",
+  "bugs": {
+    "url": "https://github.com/l-bloodstone/xchange/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/l-bloodstone/xchange.git"
+  },
+  "license": "ISC",
+  "author": "l-bloodstone",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
