@@ -1,6 +1,6 @@
 const defaultOptions = {
     symbol: "$",
-    separator: ",",
+    separator: " ",
     decimal: "."
 }
 
@@ -22,11 +22,25 @@ export default class Formatter {
         }
     }
 
-    __separateDollar() {
-
+    __formatDollar(){
+        let formattedDollar = ""
+        const dollarString = this.dollar.toString()
+        if (dollarString.length <= 3) {
+            return dollarString
+        }
+        let count = 0
+        for (let i = dollarString.length - 1; i >= 0; i--) {
+            if (count % 3 === 0 && count !== 0) {
+                formattedDollar = dollarString[i] + this.options.separator + formattedDollar
+            } else {
+                formattedDollar = dollarString[i] + formattedDollar
+            }
+            count++
+        }
+        return formattedDollar
     }
 
-    format() {
-        return `${this.options.symbol}${this.dollar}${this.options.decimal}${this.cents}`
+    format(){
+        return `${this.options.symbol}${this.__formatDollar()}${this.options.decimal}${this.cents}`
     }
 }
