@@ -10,11 +10,14 @@ export default class XAmount {
         if (cents > 99 && cents < 0) {
             throw Error("Cents can not be larger than 99 or be negative")
         }
-        this.dollar = dollar
-        this.cents = cents
-        this.amount = this.dollar * 100 + this.cents
-        this.discounted = false
-
+        if (typeof dollar === "string") {
+            this.parse(dollar)
+        } else {
+            this.dollar = dollar
+            this.cents = cents
+            this.amount = this.dollar * 100 + this.cents
+            this.discounted = false
+        }
     }
 
     __updateCurrentAmount(amount){
@@ -44,6 +47,9 @@ export default class XAmount {
         if (cents > 99 && cents < 0) {
             throw Error("Cents can not be larger than 99 or be negative")
         }
+        if (!Number.isInteger(dollar) || !Number.isInteger(cents)) {
+            throw Error("Parameters should be Integers")
+        }
         if (dollar < 0) {
             cents = -cents
         }
@@ -56,6 +62,9 @@ export default class XAmount {
         if (cents > 99 && cents < 0) {
             throw Error("Cents can not be larger than 99 or be negative")
         }
+        if (!Number.isInteger(dollar) || !Number.isInteger(cents)) {
+            throw Error("Parameters should be Integers")
+        }
         if (dollar < 0) {
             cents = -cents
         }
@@ -67,6 +76,9 @@ export default class XAmount {
     mul(dollar = 0, cents = 0){
         if (cents > 99 && cents < 0) {
             throw Error("Cents can not be larger than 99 or be negative")
+        }
+        if (!Number.isInteger(dollar) || !Number.isInteger(cents)) {
+            throw Error("Parameters should be Integers")
         }
         if (dollar < 0) {
             cents = -cents
@@ -82,6 +94,9 @@ export default class XAmount {
     div(dollar = 0, cents = 0) {
         if (cents > 99 && cents < 0) {
             throw Error("Cents can not be larger than 99 or be negative")
+        }
+        if (!Number.isInteger(dollar) || !Number.isInteger(cents)) {
+            throw Error("Parameters should be Integers")
         }
         if (dollar < 0) {
             cents = -cents
@@ -99,5 +114,17 @@ export default class XAmount {
         this.__updateCurrentAmount(discount)
         this.discounted = true
         return this.getAmount()
+    }
+
+    parse(str) {
+        let parsedNumber = Number(str)
+        if (isNaN(parsedNumber)) {
+            throw Error(`Could not parse the string.`)
+        }
+        parsedNumber *= 100
+        this.dollar = parseInt(parsedNumber / 100)
+        this.cents = parseInt(parsedNumber % 100)
+        this.amount = parseInt(parsedNumber)
+        return this
     }
 }
