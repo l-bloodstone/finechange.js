@@ -9,7 +9,7 @@ export default class Formatter {
         this.xamountFloat = xamount.toString()
         this.dollar = xamount.dollar
         this.cents = this.xamountFloat.split(".")[1]
-
+        this.amount = xamount.amount
         if (options) {
             this.options = options
             for (const op in defaultOptions) {
@@ -20,11 +20,19 @@ export default class Formatter {
         } else {
             this.options = defaultOptions
         }
+        this.formatString = `${this.options.symbol}${this.__formatDollar()}${this.options.decimal}${this.cents}`
+    }
+
+    __abs(num) {
+        if (num < 0) {
+            return -num
+        }
+        return num
     }
 
     __formatDollar(){
         let formattedDollar = ""
-        const dollarString = this.dollar.toString()
+        const dollarString = this.__abs(this.dollar).toString()
         if (dollarString.length <= 3) {
             return dollarString
         }
@@ -41,6 +49,9 @@ export default class Formatter {
     }
 
     format(){
-        return `${this.options.symbol}${this.__formatDollar()}${this.options.decimal}${this.cents}`
+        if (this.amount < 0) {
+            this.formatString = "-" + this.formatString
+        }
+        return this.formatString
     }
 }

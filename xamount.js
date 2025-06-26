@@ -1,46 +1,103 @@
 import Formatter from "./formatter.js"
 
 export default class XAmount {
-
-    constructor(dollar, cents = 0) {
+    constructor(dollar = 0, cents = 0) {
         if (!Number.isInteger(dollar) || !Number.isInteger(cents)) {
-            throw Error("Parameters should be Integers")
+            if (typeof dollar !== 'string') {
+                throw Error("Parameters should be Integers or a string")
+            }
         }
-        if (cents > 99) {
-            throw Error("Cent can not be more than 99")
+        if (cents > 99 && cents < 0) {
+            throw Error("Cents can not be larger than 99 or be negative")
         }
         this.dollar = dollar
         this.cents = cents
-        if (!cents) {
-            this.dollar = parseInt(dollar / 100)
-            this.cents = dollar % 100
-        }
-        this.amount = this.dollar + this.cents
+        this.amount = this.dollar * 100 + this.cents
+        this.discounted = false
 
     }
 
-    getAmount() {
+    __updateCurrentAmount(amount){
+        this.dollar = parseInt(amount/100)
+        this.cents = parseInt(amount % 100)
+        this.amount = amount
+    }
+
+    getAmount(){
+        return (this.dollar) + (this.cents / 100)
+    }
+
+    getAmountInCents(){
         return this.amount
     }
 
-    getAmountFloat() {
-        return this.dollar + (this.cents / 100)
+    toString(){
+        return this.getAmount().toFixed(2)
     }
 
-    toString() {
-        return this.getAmountFloat().toFixed(2)
-    }
-
-    format(options) {
+    format(options){
         const fmt = new Formatter(this, options)
         return fmt.format()
     }
-}
 
-// for (let i = 0; i < 100; i++) {
-//     const usd = new XAmount(i, i)
-//     console.log(usd.toString())
-//     console.log(usd.getAmountFloat())
-// }
-const pd = new XAmount(20,4)
-console.log(pd.format({}))
+    add(dollar = 0, cents = 0){
+        if (cents > 99 && cents < 0) {
+            throw Error("Cents can not be larger than 99 or be negative")
+        }
+        if (dollar < 0) {
+            cents = -cents
+        }
+        const amount = dollar * 100 + cents
+        this.__updateCurrentAmount(this.amount + amount)
+        return this
+    }
+
+    sub(dollar = 0, cents = 0){
+        if (cents > 99 && cents < 0) {
+            throw Error("Cents can not be larger than 99 or be negative")
+        }
+        if (dollar < 0) {
+            cents = -cents
+        }
+        const amount = dollar * 100 + cents
+        this.__updateCurrentAmount(this.amount - amount)
+        return this
+    }
+
+    mul(dollar = 0, cents = 0){
+        if (cents > 99 && cents < 0) {
+            throw Error("Cents can not be larger than 99 or be negative")
+        }
+        if (dollar < 0) {
+            cents = -cents
+        }
+        let amount = dollar * 100 + cents
+        amount = this.amount * amount
+        this.dollar = parseInt(amount / 10000)
+        this.cents = parseInt((amount % 10000) / 100)
+        this.amount = this.dollar * 100 + this.cents
+        return this
+    }
+
+    div(dollar = 0, cents = 0) {
+        if (cents > 99 && cents < 0) {
+            throw Error("Cents can not be larger than 99 or be negative")
+        }
+        if (dollar < 0) {
+            cents = -cents
+        }
+        let amount = (dollar * 100) + cents
+        amount = this.amount / amount
+        this.dollar = parseInt(amount)
+        this.cents = parseInt((amount * 100) % 100)
+        this.amount = this.dollar * 100 + this.cents
+        return this
+    }
+
+    discount(disPercent) {
+        const discount = this.amount - parseInt((this.amount * disPercent) / 100)
+        this.__updateCurrentAmount(discount)
+        this.discounted = true
+        return this.getAmount()
+    }
+}
