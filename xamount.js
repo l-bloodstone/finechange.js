@@ -1,3 +1,4 @@
+import Exchanger from "./exchanger.js"
 import Formatter from "./formatter.js"
 
 export default class XAmount {
@@ -17,7 +18,17 @@ export default class XAmount {
             this.cents = cents
             this.amount = this.dollar * 100 + this.cents
             this.discounted = false
+            this.exchanger = {}
         }
+    }
+
+    initExchanger(exchangeRates){
+        this.exchanger = new Exchanger(exchangeRates, this)
+        return this
+    }
+
+    exchange(exchageTarget) {
+        return this.exchanger.exchange(exchageTarget)
     }
 
     __updateCurrentAmount(amount){
