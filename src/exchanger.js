@@ -1,3 +1,8 @@
+//          ╭─────────────────────────────────────────────────────────╮
+//          │ Author:     L-BloodStone                                │
+//          │ Email:      lucas.bloodstone@outlook.com                │
+//          ╰─────────────────────────────────────────────────────────╯
+
 export default class Exchanger {
     constructor(exchangeRates, xamount){
         this.exchangeRates = exchangeRates

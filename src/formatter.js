@@ -1,3 +1,8 @@
+//          ╭─────────────────────────────────────────────────────────╮
+//          │ Author:     L-BloodStone                                │
+//          │ Email:      lucas.bloodstone@outlook.com                │
+//          ╰─────────────────────────────────────────────────────────╯
+
 const defaultOptions = {
     symbol: "$",
     separator: " ",
