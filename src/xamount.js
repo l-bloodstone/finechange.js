@@ -7,33 +7,34 @@ import Exchanger from "./exchanger.js"
 import Formatter from "./formatter.js"
 
 export default class XAmount {
-    constructor(dollar = 0, cents = 0) {
-        this.__sanityCheck(dollar, cents)
-        if (dollar < 0) {
-            cents = -cents
-        }
-        if (typeof dollar === "string") {
-            const {dollar: d, cents: c, amount: a} = this.parse(dollar)
+    constructor(amount = 0) {
+        this.__sanityCheck(amount)
+        if (typeof amount === "string") {
+            const {dollar: d, cents: c, amount: a} = this.parse(amount)
             this.dollar = d
             this.cents = c
             this.amount = a
         } else {
-            this.dollar = dollar
-            this.cents = cents
-            this.amount = this.dollar * 100 + this.cents
-            this.discounted = false
-            this.exchanger = {}
+            this.dollar = parseInt(amount)
+            this.cents = parseInt(amount * 100) % 100
+            this.amount = amount * 100
         }
+        this.discounted = false
+        this.exchanger = {}
     }
 
-    __sanityCheck(dollar, cents){
-        if (!Number.isInteger(dollar) || !Number.isInteger(cents)) {
-            if (typeof dollar !== 'string') {
+    fromCents(cents) {
+        this.dollar = parseInt(cents / 100)
+        this.cents = parseInt(cents % 100)
+        this.amount = cents
+        return this
+    }
+
+    __sanityCheck(amount){
+        if (!Number(amount) === amount) {
+            if (typeof amount !== 'string') {
                 throw Error("Parameters should be Integers or a string")
             }
-        }
-        if (cents > 99 && cents < 0) {
-            throw Error("Cents can not be larger than 99 or be negative")
         }
     }
 
@@ -69,71 +70,59 @@ export default class XAmount {
         return fmt.format()
     }
 
-    add(dollar = 0, cents = 0){
-        this.__sanityCheck(dollar, cents)
-        if (dollar < 0) {
-            cents = -cents
-        }
-        let amount = 0
-        if (typeof dollar === 'string') {
-            amount = parseInt(this.parse(dollar).amount)
+    add(amount = 0){
+        this.__sanityCheck(amount)
+        let amt = 0
+        if (typeof amount === 'string') {
+            amt = this.parse(amount).amount
         } else {
-            amount = (dollar * 100) + cents
+            amt = parseInt(amount * 100)
         }
-        this.__updateCurrentAmount(this.amount + amount)
+        this.__updateCurrentAmount(this.amount + amt)
         return this
     }
 
-    sub(dollar = 0, cents = 0){
-        this.__sanityCheck(dollar, cents)
-        if (dollar < 0) {
-            cents = -cents
-        }
-        let amount = 0
-        if (typeof dollar === 'string') {
-            amount = parseInt(this.parse(dollar).amount)
+    sub(amount = 0){
+        this.__sanityCheck(amount)
+        let amt = 0
+        if (typeof amount === 'string') {
+            amt = this.parse(amount).amount
         } else {
-            amount = (dollar * 100) + cents
+            amt = parseInt(amount * 100)
         }
-        this.__updateCurrentAmount(this.amount - amount)
+        this.__updateCurrentAmount(this.amount - amt)
         return this
     }
 
-    mul(dollar = 0, cents = 0){
-        this.__sanityCheck(dollar, cents)
-        if (dollar < 0) {
-            cents = -cents
-        }
-        let amount = 0
-        if (typeof dollar === 'string') {
-            amount = parseInt(this.parse(dollar).amount)
+    mul(amount = 0){
+        this.__sanityCheck(amount)
+        let amt = 0
+        if (typeof amount === 'string') {
+            amt = this.parse(amount).amount
         } else {
-            amount = (dollar * 100) + cents
+            amt = parseInt(amount * 100)
         }
-        amount = this.amount * amount
-        this.dollar = parseInt(amount / 10000)
-        this.cents = parseInt((amount % 10000) / 100)
+        amt = this.amount * amt
+        this.dollar = parseInt(amt / 10000)
+        this.cents = parseInt((amt % 10000) / 100)
         this.amount = this.dollar * 100 + this.cents
         return this
     }
 
-    div(dollar = 0, cents = 0) {
-        this.__sanityCheck(dollar, cents)
-        if (dollar < 0) {
-            cents = -cents
-        }
-        let amount = 0
-        if (typeof dollar === 'string') {
-            amount = parseInt(this.parse(dollar).amount)
+    div(amount = 0) {
+        this.__sanityCheck(amount)
+        let amt = 0
+        if (typeof amount === 'string') {
+            amount = this.parse(amount).amount
         } else {
-            amount = (dollar * 100) + cents
+            amt = parseInt(amount * 100)
         }
-        if (amount === 0) {
+        if (amt === 0) {
             throw Error("Can't divide by 'zero'")
         }
-        amount = this.amount / amount
-        this.dollar = parseInt(amount)
-        this.cents = parseInt((amount * 100) % 100)
+        amt = this.amount / amt
+        this.dollar = parseInt(amt)
+        this.cents = parseInt((amt * 100) % 100)
         this.amount = this.dollar * 100 + this.cents
         return this
     }
@@ -146,15 +135,19 @@ export default class XAmount {
     }
 
     parse(str) {
-        const regx = /\$?(-?\d*)\.?(\d{0,2})/
-        let [, dollar, cents] = regx.exec(str)
+        const regx = /(-)?.?(-)?(\d*)\.?(\d{0,2})/
+        let [, sign0, sign1, dollar, cents] = regx.exec(str)
         if (dollar === "" && cents === "") {
-            throw Error("[ERROR] Invalid string format. Acceptable: ('$20.50', '20.50', '-20.50')")
+            throw Error("[ERROR] Invalid string format. Acceptable: ('$20.50', '-$20.50, '20.50', '-20.50')")
+        }
+        if (cents.length !== 2) {
+            cents += "0"
         }
         dollar = Number(dollar)
         cents = Number(cents)
-        if (dollar < 0) {
+        if (sign1 === "-" || sign0 === "-") {
             cents = -cents
+            dollar = -dollar
         }
         const amount = dollar * 100 + cents
         return {dollar, cents, amount}
