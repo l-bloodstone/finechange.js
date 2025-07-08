@@ -11,6 +11,18 @@ export default class Exchanger {
         this.xamount = xamount
     }
 
+    __generateNewExchangeRate(baseCurrency, exchangeRates) {
+        const newExchangeRate = { }
+        for (const currency in exchangeRates) {
+            if (currency === baseCurrency) {
+                continue
+            }
+            newExchangeRate[currency] = exchangeRates[currency] / exchangeRates[baseCurrency]
+        }
+        newExchangeRate[baseCurrency] = 1
+        return newExchangeRate
+    }
+
     exchange(targetCurrency) {
         let targetCurrencyRate = 0
         if (this.exchangeRates.hasOwnProperty(targetCurrency)) {
@@ -20,6 +32,7 @@ export default class Exchanger {
             throw Error("[ERROR] Exchange rate can not be negative or zero")
         }
         const amount = parseInt(this.xamount.amount * targetCurrencyRate)
-        return new XAmount().fromCents(amount).initExchanger(this.exchangeRates)
+        return new XAmount().fromCents(amount)
+            .initExchanger(this.__generateNewExchangeRate(targetCurrency, this.exchangeRates))
     }
 }
