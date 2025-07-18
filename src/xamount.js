@@ -104,7 +104,7 @@ export default class XAmount {
         }
         amt = this.amount * amt
         this.dollar = parseInt(amt / 10000)
-        this.cents = parseInt((amt % 10000) / 100)
+        this.cents = Math.round((amt % 10000) / 100)
         this.amount = this.dollar * 100 + this.cents
         return this
     }
@@ -117,7 +117,7 @@ export default class XAmount {
         } else {
             amt = parseInt(amount * 100)
         }
-        if (amt === 0) {
+        if (amt === 0 || this.amount === 0) {
             throw Error("Can't divide by 'zero'")
         }
         amt = this.amount / amt
