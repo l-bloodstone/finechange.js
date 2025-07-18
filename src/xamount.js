@@ -127,11 +127,16 @@ export default class XAmount {
         return this
     }
 
-    discount(disPercent) {
-        const discount = this.amount - parseInt((this.amount * disPercent) / 100)
+    applyDiscount(disPercent) {
+        const discount = this.amount - Math.round((this.amount * disPercent) / 100)
         this.__updateCurrentAmount(discount)
         this.discounted = true
         return this.getAmount()
+    }
+
+    getDiscount(disPercent) {
+        const discount = this.amount - Math.round((this.amount * disPercent) / 100)
+        return discount / 100
     }
 
     parse(str) {
