@@ -122,7 +122,7 @@ export default class XAmount {
         }
         amt = this.amount / amt
         this.dollar = parseInt(amt)
-        this.cents = parseInt((amt * 100) % 100)
+        this.cents = Math.round((amt * 100) % 100)
         this.amount = this.dollar * 100 + this.cents
         return this
     }
