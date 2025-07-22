@@ -3,7 +3,7 @@
 //          │ Email:      lucas.bloodstone@outlook.com                │
 //          ╰─────────────────────────────────────────────────────────╯
 
-import XAmount from "../index.js";
+import XAmount from "./xamount.js";
 
 export default class Exchanger {
     constructor(exchangeRates, xamount){
@@ -31,7 +31,7 @@ export default class Exchanger {
         if (targetCurrencyRate < 0 || targetCurrencyRate === 0) {
             throw Error("[ERROR] Exchange rate can not be negative or zero")
         }
-        const amount = parseInt(this.xamount.amount * targetCurrencyRate)
+        const amount = Math.round(this.xamount.amount * targetCurrencyRate)
         return new XAmount().fromCents(amount)
             .initExchanger(this.__generateNewExchangeRate(targetCurrency, this.exchangeRates))
     }

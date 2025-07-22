@@ -15,23 +15,22 @@ export default class XAmount {
             this.cents = c
             this.amount = a
         } else {
-            this.dollar = parseInt(amount)
-            this.cents = parseInt(amount * 100) % 100
-            this.amount = amount * 100
+            this.amount = Math.round(amount * 100)
+            this.dollar = parseInt(this.amount / 100)
+            this.cents = this.amount % 100
         }
         this.discounted = false
-        this.exchanger = {}
     }
 
     fromCents(cents) {
         this.dollar = parseInt(cents / 100)
-        this.cents = parseInt(cents % 100)
+        this.cents = cents % 100
         this.amount = cents
         return this
     }
 
     __sanityCheck(amount){
-        if (!Number(amount) === amount) {
+        if (Number.isNaN(amount)) {
             if (typeof amount !== 'string') {
                 throw Error("Parameters should be Integers or a string")
             }
@@ -76,7 +75,7 @@ export default class XAmount {
         if (typeof amount === 'string') {
             amt = this.parse(amount).amount
         } else {
-            amt = parseInt(amount * 100)
+            amt = Math.round(amount * 100)
         }
         this.__updateCurrentAmount(this.amount + amt)
         return this
@@ -88,7 +87,7 @@ export default class XAmount {
         if (typeof amount === 'string') {
             amt = this.parse(amount).amount
         } else {
-            amt = parseInt(amount * 100)
+            amt = Math.round(amount * 100)
         }
         this.__updateCurrentAmount(this.amount - amt)
         return this
@@ -100,7 +99,7 @@ export default class XAmount {
         if (typeof amount === 'string') {
             amt = this.parse(amount).amount
         } else {
-            amt = parseInt(amount * 100)
+            amt = Math.round(amount * 100)
         }
         amt = this.amount * amt
         this.dollar = parseInt(amt / 10000)
@@ -113,9 +112,9 @@ export default class XAmount {
         this.__sanityCheck(amount)
         let amt = 0
         if (typeof amount === 'string') {
-            amount = this.parse(amount).amount
+            amt = this.parse(amount).amount
         } else {
-            amt = parseInt(amount * 100)
+            amt = Math.round(amount * 100)
         }
         if (amt === 0 || this.amount === 0) {
             throw Error("Can't divide by 'zero'")
@@ -140,21 +139,17 @@ export default class XAmount {
     }
 
     parse(str) {
-        const regx = /(-)?.?(-)?(\d*)\.?(\d{0,2})/
-        let [, sign0, sign1, dollar, cents] = regx.exec(str)
-        if (dollar === "" && cents === "") {
-            throw Error("[ERROR] Invalid string format. Acceptable: ('$20.50', '-$20.50, '20.50', '-20.50')")
+        const regx = /(-?)\$?(-?)(\d*\.?\d*)?/
+        const [, sign, sign1, number] = regx.exec(str)
+        if (!number) {
+            throw Error('Invalid String format. Acceptable - ($20.99, -$20.99, 20.99, -20.99)')
         }
-        if (cents.length !== 2) {
-            cents += "0"
+        let amount = Math.round(Number(number) * 100)
+        if (sign || sign1 && amount > 0) {
+            amount = -amount
         }
-        dollar = Number(dollar)
-        cents = Number(cents)
-        if (sign1 === "-" || sign0 === "-") {
-            cents = -cents
-            dollar = -dollar
-        }
-        const amount = dollar * 100 + cents
+        const dollar = parseInt(amount / 100)
+        const cents = parseInt(amount % 100)
         return {dollar, cents, amount}
     }
 }
