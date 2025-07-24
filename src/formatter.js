@@ -12,7 +12,7 @@ const defaultOptions = {
 export default class Formatter {
     constructor(xamount, options) {
         this.xamountFloat = xamount.toString()
-        this.dollar = xamount.dollar
+        this.dollar = xamount.getDollars()
         this.cents = this.xamountFloat.split(".")[1]
         this.amount = xamount.amount
         if (options) {

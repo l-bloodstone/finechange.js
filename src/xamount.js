@@ -10,21 +10,23 @@ export default class XAmount {
     constructor(amount = 0) {
         this.__sanityCheck(amount)
         if (typeof amount === "string") {
-            const {dollar: d, cents: c, amount: a} = this.parse(amount)
-            this.dollar = d
-            this.cents = c
+            const {amount: a} = this.parse(amount)
             this.amount = a
         } else {
             this.amount = Math.round(amount * 100)
-            this.dollar = parseInt(this.amount / 100)
-            this.cents = this.amount % 100
         }
         this.discounted = false
     }
 
+    getDollars() {
+        return parseInt(this.amount / 100)
+    }
+
+    getCents() {
+        return this.amount % 100
+    }
+
     fromCents(cents) {
-        this.dollar = parseInt(cents / 100)
-        this.cents = cents % 100
         this.amount = cents
         return this
     }
@@ -47,13 +49,11 @@ export default class XAmount {
     }
 
     __updateCurrentAmount(amount){
-        this.dollar = parseInt(amount/100)
-        this.cents = parseInt(amount % 100)
         this.amount = amount
     }
 
     getAmount(){
-        return (this.dollar) + (this.cents / 100)
+        return this.amount / 100
     }
 
     getAmountInCents(){
@@ -102,9 +102,7 @@ export default class XAmount {
             amt = Math.round(amount * 100)
         }
         amt = this.amount * amt
-        this.dollar = parseInt(amt / 10000)
-        this.cents = Math.round((amt % 10000) / 100)
-        this.amount = this.dollar * 100 + this.cents
+        this.amount = Math.round(amt / 100)
         return this
     }
 
@@ -120,9 +118,7 @@ export default class XAmount {
             throw Error("Can't divide by 'zero'")
         }
         amt = this.amount / amt
-        this.dollar = parseInt(amt)
-        this.cents = Math.round((amt * 100) % 100)
-        this.amount = this.dollar * 100 + this.cents
+        this.amount = Math.round(amt * 100)
         return this
     }
 
@@ -145,11 +141,11 @@ export default class XAmount {
             throw Error('Invalid String format. Acceptable - ($20.99, -$20.99, 20.99, -20.99)')
         }
         let amount = Math.round(Number(number) * 100)
-        if (sign || sign1 && amount > 0) {
+        if ((sign || sign1) && amount > 0) {
             amount = -amount
         }
-        const dollar = parseInt(amount / 100)
+        const dollars = parseInt(amount / 100)
         const cents = parseInt(amount % 100)
-        return {dollar, cents, amount}
+        return {dollars: dollars, cents, amount}
     }
 }

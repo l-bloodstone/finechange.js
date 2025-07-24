@@ -24,13 +24,13 @@ describe("XAmount Constructor", ()=> {
     })
 
     it("should give us dollar = 20 and cents = 05", ()=> {
-        assert.deepEqual(new XAmount(20.05).dollar, 20)
-        assert.deepEqual(new XAmount(20.05).cents, 5)
+        assert.deepEqual(new XAmount(20.05).getDollars(), 20)
+        assert.deepEqual(new XAmount(20.05).getCents(), 5)
     })
 
     it("should parse `20.126` as 20 dollar 13 cents", () => {
-        assert.equal(new XAmount("20.126").dollar, 20)
-        assert.equal(new XAmount("20.126").cents, 13)
+        assert.equal(new XAmount("20.126").getDollars(), 20)
+        assert.equal(new XAmount("20.126").getCents(), 13)
     })
 
     it("should parse the float with a round 123.456 => 123.46", ()=> {
@@ -78,5 +78,15 @@ describe("initExchanger() method", ()=> {
 
     it("should exchange from USD to CAD 25.22 => 34.55 with 1.37CAD per USD", ()=> {
         assert.equal(new XAmount(25.22).initExchanger({cad: 1.37}).exchange("cad").getAmount(), 34.55)
+    })
+})
+
+describe("XAmount Formatter", ()=>{
+    it('should not throw error', ()=> {
+        assert.doesNotThrow(()=> {new XAmount(123.455).format()})
+    })
+
+    it('should get a formatted string based on `option parameter`', ()=> {
+        assert.equal(new XAmount(123321.45).format({separator: ',', symbol: '¥'}), "¥123,321.45")
     })
 })
