@@ -27,6 +27,9 @@ export default class XAmount {
     }
 
     fromCents(cents) {
+        if (!Number.isInteger(cents)){
+            throw Error("[ERROR] Cents sould be an Integer")
+        }
         this.amount = cents
         return this
     }
